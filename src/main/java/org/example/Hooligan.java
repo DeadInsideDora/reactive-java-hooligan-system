@@ -27,4 +27,36 @@ public class Hooligan {
     public void setStatus(HooliganStatus status) {
         this.status = status;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public LocalDate getBithDate() {
+        return bithDate;
+    }
+
+    public void setBithDate(LocalDate bithDate) {
+        this.bithDate = bithDate;
+    }
+
+    public Info getInfo() {
+        return info;
+    }
+
+    public void setInfo(Info info) {
+        this.info = info;
+    }
+
+    public List<Violation> getViolation() {
+        return violation;
+    }
 }
