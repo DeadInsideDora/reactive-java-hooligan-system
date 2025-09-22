@@ -21,4 +21,8 @@ public class Violation {
         this.punishment = punishment;
         this.hasExplanation = hasExplanation;
     }
+
+    public double getPunishmentValue() {
+        return punishment.getPunishmentValues(punishment);
+    }
 }

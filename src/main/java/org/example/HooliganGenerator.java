@@ -94,44 +94,58 @@ public class HooliganGenerator {
     }
 
     private static List<Violation> generateViolations(LocalDate enrollmentDate) {
-        int count = RANDOM.nextInt(4);
+        int maxAttempts = 3 + RANDOM.nextInt(3);
         List<Violation> violations = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
+        double totalWeight = 0.0;
+
+        for (int i = 0; i < maxAttempts && totalWeight < 1.0; i++) {
             boolean inDept = RANDOM.nextBoolean();
             Department department = new Department(
                     DEPARTMENTS[RANDOM.nextInt(DEPARTMENTS.length)],
                     inDept,
-                    inDept ? 1000 + RANDOM.nextInt(6000): -1
+                    inDept ? 1000 + RANDOM.nextInt(6000) : -1
             );
 
-            String behavior =  BEHAVIORS[RANDOM.nextInt(BEHAVIORS.length)];
-            boolean alcoholUsage;
-            if (behavior.equalsIgnoreCase("Распитие алкоголя")
-                    || behavior.equalsIgnoreCase("Нахождение в нетрезвом состоянии")) {
-                alcoholUsage = true;
-            } else {
-                alcoholUsage = RANDOM.nextBoolean();
-            }
+            String behavior = BEHAVIORS[RANDOM.nextInt(BEHAVIORS.length)];
+            boolean alcoholUsage = behavior.equalsIgnoreCase("Распитие алкоголя")
+                    || behavior.equalsIgnoreCase("Нахождение в нетрезвом состоянии")
+                    || RANDOM.nextBoolean();
 
-            Punishment punishment = Punishment.values()[RANDOM.nextInt(Punishment.values().length)];
+            Punishment punishment = selectAppropriatePunishment(1.0 - totalWeight);
 
-            Violation v = new Violation(
-                    1 + RANDOM.nextInt(5),
-                    alcoholUsage,
-                    department,
-                    LocalDate.now().minusDays(RANDOM.nextLong(ChronoUnit.DAYS.between(enrollmentDate, LocalDate.now()))),
-                    behavior,
-                    Punishment.values()[RANDOM.nextInt(Punishment.values().length)],
-                    RANDOM.nextBoolean()
-            );
+            double punishmentWeight = punishment.getPunishmentValues(punishment);
 
-            violations.add(v);
+            if (totalWeight + punishmentWeight <= 1.0) {
+                Violation v = new Violation(
+                        1 + RANDOM.nextInt(5),
+                        alcoholUsage,
+                        department,
+                        LocalDate.now().minusDays(RANDOM.nextLong(
+                                Math.max(1, ChronoUnit.DAYS.between(enrollmentDate, LocalDate.now())))),
+                        behavior,
+                        punishment,
+                        RANDOM.nextBoolean()
+                );
 
-            if (punishment == Punishment.EXPULSION) {
-                break;
+                violations.add(v);
+                totalWeight += punishmentWeight;
+
+                if (punishment == Punishment.EXPULSION) {
+                    break;
+                }
             }
         }
         return violations;
+    }
+
+    private static Punishment selectAppropriatePunishment(double remainingWeight) {
+        if (remainingWeight >= 1.0) {
+            return Punishment.values()[RANDOM.nextInt(Punishment.values().length)];
+        } else if (remainingWeight >= 0.4) {
+            return RANDOM.nextBoolean() ? Punishment.WARNING : Punishment.REMARK;
+        } else {
+            return Punishment.REMARK;
+        }
     }
 
     public static Hooligan generateHooligan() {
