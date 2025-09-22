@@ -1,4 +1,5 @@
 plugins {
+    id 'application'
     id 'java'
 }
 
@@ -16,4 +17,16 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+application {
+    mainClass = 'org.example.Main'
+}
+
+tasks.register('runMain', JavaExec) {
+    group = 'application'
+
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'org.example.Main'
+    jvmArgs '-Xmx512m'
 }

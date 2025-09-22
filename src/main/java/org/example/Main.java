@@ -14,7 +14,7 @@ public class Main {
 
         for (int size : sizes) {
             List<Hooligan> hooligans = HooliganGenerator.generateHooligans(size);
-            HooliganStatsBenchmark.runBenchmarks(calculators, hooligans);
+            HooliganStatsBenchmark.runBenchmarks(calculators, hooligans, "result.txt");
         }
     }
 
