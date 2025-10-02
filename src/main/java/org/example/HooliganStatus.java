@@ -12,14 +12,7 @@ public enum HooliganStatus {
     ITMO_FAMILY("Выпускник"),
     EXPELLED("Отчислен");
 
-    private final String description;
-
     HooliganStatus(String description) {
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
     }
 }
 
