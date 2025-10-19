@@ -2,61 +2,57 @@ package org.example;
 
 import java.time.LocalDate;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 public class Hooligan {
+    @Getter
     private final int id;
+    @Getter
+    @Setter
     private String name;
-    private LocalDate bithDate;
+    @Getter
+    private final LocalDate birthDate;
+    @Getter
+    @Setter
     private HooliganStatus status;
+    @Getter
+    @Setter
     private Info info;
+    @Getter
     private final List<Violation> violation;
 
-    public Hooligan(int id, String name, LocalDate bithDate, HooliganStatus status, Info info, List<Violation> violation) {
+    public Hooligan(int id, String name, LocalDate birthDate, HooliganStatus status, Info info, List<Violation> violation) {
         this.id = id;
         this.name = name;
-        this.bithDate = bithDate;
+        this.birthDate = birthDate;
         this.status = status;
         this.info = info;
         this.violation = violation;
     }
 
-    public HooliganStatus getStatus() {
-        return status;
+    private void sleep(int delay) {
+        if (delay > 0) {
+            try {
+                Thread.sleep(delay);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
-    public void setStatus(HooliganStatus status) {
-        this.status = status;
+    public Info getInfo(int delay) {
+        sleep(delay);
+        return getInfo();
     }
 
-    public int getId() {
-        return id;
+    public HooliganStatus getStatus(int delay) {
+        sleep(delay);
+        return getStatus();
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public LocalDate getBithDate() {
-        return bithDate;
-    }
-
-    public void setBithDate(LocalDate bithDate) {
-        this.bithDate = bithDate;
-    }
-
-    public Info getInfo() {
-        return info;
-    }
-
-    public void setInfo(Info info) {
-        this.info = info;
-    }
-
-    public List<Violation> getViolation() {
+    public List<Violation> getViolation(int delay) {
+        sleep(delay);
         return violation;
     }
 }
