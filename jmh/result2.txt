@@ -1,0 +1,5 @@
+Benchmark                               (delayMillis)  (size)  Mode  Cnt      Score     Error  Units
+JMHHooliganRxBenchmark.parallelStreams              5     500  avgt   25   1967,770 ±  78,069  ms/op
+JMHHooliganRxBenchmark.parallelStreams              5    2000  avgt   25   7978,354 ± 307,678  ms/op
+JMHHooliganRxBenchmark.rxObservable                 5     500  avgt   25   6015,691 ±  18,626  ms/op
+JMHHooliganRxBenchmark.rxObservable                 5    2000  avgt   25  24905,797 ± 933,816  ms/op

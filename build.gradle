@@ -24,6 +24,8 @@ dependencies {
 
     implementation 'org.openjdk.jmh:jmh-core:1.37'
     annotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
+
+    implementation("io.reactivex.rxjava3:rxjava:3.1.8")
 }
 
 test {

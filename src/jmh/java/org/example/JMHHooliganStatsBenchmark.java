@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 @Fork(2)
 @State(Scope.Benchmark)
 public class JMHHooliganStatsBenchmark {
-    @Param({"1000", "10000", " "})
+    @Param({"1000", "10000", "50000"})
     private int size;
 
     @Param({"0", "1"})
@@ -30,12 +30,12 @@ public class JMHHooliganStatsBenchmark {
     }
 
     @Benchmark
-    public HooliganStats sequential() {
+    public HooliganStats sequential() throws InterruptedException {
         return sequential.calculate(hooligans);
     }
 
     @Benchmark
-    public HooliganStats parallel() {
+    public HooliganStats parallel() throws InterruptedException {
         return parallel.calculate(hooligans);
     }
 }

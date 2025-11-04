@@ -30,12 +30,12 @@ public class JMHHooliganSpliteratorVSParallelIStream {
     }
 
     @Benchmark
-    public HooliganStats spliterator() {
+    public HooliganStats spliterator() throws InterruptedException {
         return spliterator.calculate(hooligans);
     }
 
     @Benchmark
-    public HooliganStats parallel() {
+    public HooliganStats parallel() throws InterruptedException {
         return parallel.calculate(hooligans);
     }
 }

@@ -20,7 +20,13 @@ public class HooliganStatsBenchmark {
 
             calculators.forEach((name, calculator) -> {
                 BenchmarkUtils.ResultWithTime<HooliganStats> result = BenchmarkUtils.measure(name + " " + hooligans.size(),
-                        () -> calculator.calculate(hooligans));
+                        () -> {
+                            try {
+                                return calculator.calculate(hooligans);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
                 String fullResult = LocalDateTime.now().format(formatter) + " - " + result;
 
                 System.out.println(result);
