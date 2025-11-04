@@ -1,0 +1,13 @@
+Benchmark                             (delay)  (size)  Mode  Cnt       Score       Error  Units
+JMHHooliganStatsBenchmark.parallel          0    1000  avgt   10       0,455 ±     0,018  ms/op
+JMHHooliganStatsBenchmark.parallel          0   10000  avgt   10       3,375 ±     0,526  ms/op
+JMHHooliganStatsBenchmark.parallel          0   50000  avgt   10      19,142 ±     2,385  ms/op
+JMHHooliganStatsBenchmark.parallel          1    1000  avgt   10     798,605 ±     8,146  ms/op
+JMHHooliganStatsBenchmark.parallel          1   10000  avgt   10    7900,070 ±    19,112  ms/op
+JMHHooliganStatsBenchmark.parallel          1   50000  avgt   10   40562,543 ±  3057,794  ms/op
+JMHHooliganStatsBenchmark.sequential        0    1000  avgt   10       0,385 ±     0,088  ms/op
+JMHHooliganStatsBenchmark.sequential        0   10000  avgt   10       3,966 ±     0,065  ms/op
+JMHHooliganStatsBenchmark.sequential        0   50000  avgt   10      28,261 ±     0,935  ms/op
+JMHHooliganStatsBenchmark.sequential        1    1000  avgt   10    7053,660 ±   814,054  ms/op
+JMHHooliganStatsBenchmark.sequential        1   10000  avgt   10   67497,574 ±  8234,946  ms/op
+JMHHooliganStatsBenchmark.sequential        1   50000  avgt   10  325831,738 ± 19024,095  ms/op

@@ -35,6 +35,7 @@ public class HooliganStatsCollector implements Collector<Hooligan, HooliganStats
     @Override
     public Set<Characteristics> characteristics() {
         return Set.of();
+
     }
 
     @Override
