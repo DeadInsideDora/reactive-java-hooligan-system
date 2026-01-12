@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/hooliguns
+    username: hooliguns
+    password: hooliguns
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/hooliguns
+
+hooliguns:
+  admin:
+    username: admin
+    password: admin
