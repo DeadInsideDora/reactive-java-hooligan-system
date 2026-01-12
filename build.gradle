@@ -1,7 +1,7 @@
 plugins {
-    id 'application'
     id 'java'
-    id 'me.champeau.jmh' version '0.7.2'
+    id 'org.springframework.boot' version '3.3.2'
+    id 'io.spring.dependency-management' version '1.1.6'
 }
 
 group = 'org.example'
@@ -12,34 +12,36 @@ repositories {
     gradlePluginPortal()
 }
 
-dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-
-    compileOnly("org.projectlombok:lombok:1.18.42")
-    annotationProcessor("org.projectlombok:lombok:1.18.42")
-
-    testCompileOnly("org.projectlombok:lombok:1.18.42")
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.42")
-
-    implementation 'org.openjdk.jmh:jmh-core:1.37'
-    annotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
-
-    implementation("io.reactivex.rxjava3:rxjava:3.1.8")
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
-test {
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0'
+    implementation 'io.reactivex.rxjava3:rxjava:3.1.8'
+
+    runtimeOnly 'org.postgresql:r2dbc-postgresql'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    compileOnly 'org.projectlombok:lombok:1.18.42'
+    annotationProcessor 'org.projectlombok:lombok:1.18.42'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+}
+
+tasks.named('test') {
     useJUnitPlatform()
 }
 
-application {
-    mainClass = 'org.example.Main'
-}
-
-tasks.register('runMain', JavaExec) {
-    group = 'application'
-
-    classpath = sourceSets.main.runtimeClasspath
-    mainClass = 'org.example.Main'
-    jvmArgs '-Xmx512m'
+springBoot {
+    mainClass = 'org.example.hooliguns.HooliGunsApplication'
 }
