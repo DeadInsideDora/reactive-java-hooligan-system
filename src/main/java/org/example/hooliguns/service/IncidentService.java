@@ -31,19 +31,30 @@ public class IncidentService {
     }
 
     public Mono<IncidentResponse> create(CreateIncidentRequest request, UUID createdById) {
-        Incident incident = new Incident(
-                UUID.randomUUID(),
-                request.title(),
-                request.description(),
-                request.place(),
-                request.type(),
-                request.occurredAt(),
-                Instant.now(),
-                request.offenderId(),
-                createdById,
-                ModerationStatus.PUBLISHED
-        );
-        return incidentRepository.save(incident)
+        Mono<Void> offenderCheck = userService.findById(request.offenderId())
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Offender not found")))
+                .then();
+        Mono<Void> creatorCheck = userService.findById(createdById)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Creator not found")))
+                .then();
+
+        return Mono.when(offenderCheck, creatorCheck)
+                .then(Mono.defer(() -> {
+                    Incident incident = new Incident(
+                            UUID.randomUUID(),
+                            request.title(),
+                            request.description(),
+                            request.place(),
+                            request.type(),
+                            request.occurredAt(),
+                            Instant.now(),
+                            request.offenderId(),
+                            createdById,
+                            ModerationStatus.PUBLISHED,
+                            true
+                    );
+                    return incidentRepository.save(incident);
+                }))
                 .flatMap(this::toResponse)
                 .doOnNext(response -> sink.tryEmitNext(response));
     }
@@ -168,7 +179,7 @@ public class IncidentService {
             return responses;
         }
         if (sort == IncidentSort.RATING_DESC) {
-            responses.sort(Comparator.comparingDouble(response -> response.type().getBasePoints()
+            responses.sort(Comparator.comparingDouble((IncidentResponse response) -> response.type().getBasePoints()
                     + (response.likes() - response.dislikes()) * 0.5).reversed());
             return responses;
         }

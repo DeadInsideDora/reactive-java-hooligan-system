@@ -24,20 +24,18 @@ public class UserService {
 
     public Mono<UserResponse> createUser(CreateUserRequest request) {
         return userAccountRepository.findByUsername(request.username())
-                .flatMap(existing -> Mono.error(new IllegalArgumentException("Username already exists")))
-                .switchIfEmpty(Mono.defer(() -> {
-                    UserAccount account = new UserAccount(
-                            UUID.randomUUID(),
-                            request.username(),
-                            passwordEncoder.encode(request.password()),
-                            request.displayName(),
-                            request.role(),
-                            request.faculty(),
-                            request.groupName(),
-                            Instant.now()
-                    );
-                    return userAccountRepository.save(account).map(this::toResponse);
-                }));
+                .flatMap(existing -> Mono.<UserResponse>error(new IllegalArgumentException("Username already exists")))
+                .switchIfEmpty(Mono.defer(() -> userAccountRepository.save(new UserAccount(
+                        UUID.randomUUID(),
+                        request.username(),
+                        passwordEncoder.encode(request.password()),
+                        request.displayName(),
+                        request.role(),
+                        request.faculty(),
+                        request.groupName(),
+                        Instant.now(),
+                        true
+                )).map(this::toResponse)));
     }
 
     public Flux<UserResponse> listUsers() {

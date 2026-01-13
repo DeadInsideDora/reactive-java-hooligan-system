@@ -8,16 +8,21 @@ import org.example.hooliguns.domain.IncidentComment;
 import org.example.hooliguns.domain.IncidentReaction;
 import org.example.hooliguns.domain.IncidentSocial;
 import org.example.hooliguns.domain.ReactionType;
+import org.example.hooliguns.dto.CommentResponse;
 import org.example.hooliguns.repository.IncidentSocialRepository;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
 public class IncidentSocialService {
     private final IncidentSocialRepository incidentSocialRepository;
+    private final UserService userService;
 
-    public IncidentSocialService(IncidentSocialRepository incidentSocialRepository) {
+    public IncidentSocialService(IncidentSocialRepository incidentSocialRepository,
+                                 UserService userService) {
         this.incidentSocialRepository = incidentSocialRepository;
+        this.userService = userService;
     }
 
     public Mono<IncidentSocialSummary> summary(UUID incidentId) {
@@ -53,6 +58,20 @@ public class IncidentSocialService {
                     social.setUpdatedAt(Instant.now());
                     return incidentSocialRepository.save(social);
                 });
+    }
+
+    public Flux<CommentResponse> getComments(UUID incidentId) {
+        return incidentSocialRepository.findByIncidentId(incidentId)
+                .flatMapMany(social -> Flux.fromIterable(
+                        social.getComments() == null ? List.of() : social.getComments()
+                ))
+                .flatMap(comment -> userService.findById(comment.getUserId())
+                        .map(user -> new CommentResponse(
+                                comment.getUserId(),
+                                user.getDisplayName(),
+                                comment.getText(),
+                                comment.getCreatedAt()
+                        )));
     }
 
     private IncidentSocialSummary toSummary(IncidentSocial social) {

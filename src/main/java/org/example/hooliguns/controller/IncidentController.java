@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.UUID;
 import org.example.hooliguns.domain.IncidentType;
 import org.example.hooliguns.dto.CommentRequest;
+import org.example.hooliguns.dto.CommentResponse;
 import org.example.hooliguns.dto.CreateIncidentRequest;
 import org.example.hooliguns.dto.IncidentResponse;
 import org.example.hooliguns.dto.ModerationRequest;
@@ -84,6 +85,12 @@ public class IncidentController {
                               @Valid @RequestBody CommentRequest request,
                               @AuthenticationPrincipal AuthenticatedUser user) {
         return incidentSocialService.addComment(id, user.getId(), request.text()).then();
+    }
+
+    @GetMapping("/{id}/comments")
+    @PreAuthorize("hasAnyRole('TEACHER','STUDENT','ADMIN')")
+    public Flux<CommentResponse> comments(@PathVariable UUID id) {
+        return incidentSocialService.getComments(id);
     }
 
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

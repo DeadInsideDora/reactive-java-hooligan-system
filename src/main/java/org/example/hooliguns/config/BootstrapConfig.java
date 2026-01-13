@@ -28,7 +28,8 @@ public class BootstrapConfig {
                         UserRole.ADMIN,
                         null,
                         null,
-                        Instant.now()
+                        Instant.now(),
+                        true
                 )))
                 .subscribe();
     }
