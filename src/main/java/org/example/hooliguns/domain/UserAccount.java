@@ -1,6 +1,7 @@
 package org.example.hooliguns.domain;
 
 import java.time.Instant;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,10 +15,12 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("users")
-public class UserAccount implements Persistable<String> {
+public class UserAccount implements Persistable<UUID> {
     @Id
-    private String id;
+    private UUID id;
     private String username;
+    @Column("isu")
+    private String isu;
     private String password;
     @Column("display_name")
     private String displayName;

@@ -1,6 +1,7 @@
 package org.example.hooliguns.controller;
 
 import jakarta.validation.Valid;
+import java.util.UUID;
 import org.example.hooliguns.dto.CreateUserRequest;
 import org.example.hooliguns.dto.RegisterUserRequest;
 import org.example.hooliguns.dto.UpdateUserRoleRequest;
@@ -35,7 +36,7 @@ public class UserController {
 
     @PatchMapping("/{id}/role")
     @PreAuthorize("hasAnyRole('ADMIN','IMMORTAL')")
-    public Mono<UserResponse> updateRole(@PathVariable String id,
+    public Mono<UserResponse> updateRole(@PathVariable UUID id,
                                          @Valid @RequestBody UpdateUserRoleRequest request) {
         return userService.updateUserRole(id, request.role());
     }

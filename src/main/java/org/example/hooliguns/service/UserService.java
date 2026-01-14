@@ -1,6 +1,7 @@
 package org.example.hooliguns.service;
 
 import java.time.Instant;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import org.example.hooliguns.domain.UserAccount;
 import org.example.hooliguns.domain.UserRole;
@@ -28,9 +29,10 @@ public class UserService {
     public Mono<UserResponse> createUser(CreateUserRequest request) {
         String isu = normalizeIsu(request.username());
         validateIsu(isu);
-        return userAccountRepository.findByUsername(isu)
-                .flatMap(existing -> Mono.<UserResponse>error(new IllegalArgumentException("Username already exists")))
+        return userAccountRepository.findByIsu(isu)
+                .flatMap(existing -> Mono.<UserResponse>error(new IllegalArgumentException("ISU already exists")))
                 .switchIfEmpty(Mono.defer(() -> userAccountRepository.save(new UserAccount(
+                        UUID.randomUUID(),
                         isu,
                         isu,
                         passwordEncoder.encode(request.password()),
@@ -46,9 +48,10 @@ public class UserService {
     public Mono<UserResponse> registerUser(RegisterUserRequest request) {
         String isu = normalizeIsu(request.username());
         validateIsu(isu);
-        return userAccountRepository.findByUsername(isu)
-                .flatMap(existing -> Mono.<UserResponse>error(new IllegalArgumentException("Username already exists")))
+        return userAccountRepository.findByIsu(isu)
+                .flatMap(existing -> Mono.<UserResponse>error(new IllegalArgumentException("ISU already exists")))
                 .switchIfEmpty(Mono.defer(() -> userAccountRepository.save(new UserAccount(
+                        UUID.randomUUID(),
                         isu,
                         isu,
                         passwordEncoder.encode(request.password()),
@@ -66,15 +69,20 @@ public class UserService {
                 .map(this::toResponse);
     }
 
-    public Mono<UserAccount> findById(String id) {
+    public Mono<UserAccount> findByIsu(String isu) {
+        String normalized = normalizeIsu(isu);
+        return userAccountRepository.findByIsu(normalized);
+    }
+
+    public Mono<UserAccount> findById(UUID id) {
         return userAccountRepository.findById(id);
     }
 
-    public Mono<UserResponse> getUser(String id) {
+    public Mono<UserResponse> getUser(UUID id) {
         return findById(id).map(this::toResponse);
     }
 
-    public Mono<UserResponse> updateUserRole(String id, UserRole role) {
+    public Mono<UserResponse> updateUserRole(UUID id, UserRole role) {
         return userAccountRepository.findById(id)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("User not found")))
                 .flatMap(user -> {
@@ -88,6 +96,7 @@ public class UserService {
         return new UserResponse(
                 account.getId(),
                 account.getUsername(),
+                account.getIsu(),
                 account.getDisplayName(),
                 account.getRole(),
                 account.getFaculty(),

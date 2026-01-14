@@ -19,7 +19,6 @@ compose() {
 
 echo "Запускаю Mongo..."
 compose up -d mongo >/dev/null
-
 ALERTS_JSON=$(cat <<'EOF'
 [
   { "message": "Студент в 1327 в куртке!", "createdAt": ISODate("2026-01-14T01:47:35Z") },

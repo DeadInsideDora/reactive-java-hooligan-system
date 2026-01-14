@@ -1,14 +1,15 @@
 package org.example.hooliguns.dto;
 
 import java.time.Instant;
+import java.util.UUID;
 
 public record CommentReportResponse(
         String id,
-        java.util.UUID incidentId,
-        java.util.UUID commentId,
-        String reporterId,
+        UUID incidentId,
+        UUID commentId,
+        UUID reporterId,
         String reporterDisplayName,
-        String commentAuthorId,
+        UUID commentAuthorId,
         String commentAuthorDisplayName,
         String commentText,
         Instant commentCreatedAt,

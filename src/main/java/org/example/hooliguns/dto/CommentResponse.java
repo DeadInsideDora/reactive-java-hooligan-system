@@ -1,10 +1,11 @@
 package org.example.hooliguns.dto;
 
 import java.time.Instant;
+import java.util.UUID;
 
 public record CommentResponse(
-        java.util.UUID id,
-        String userId,
+        UUID id,
+        UUID userId,
         String displayName,
         String text,
         Instant createdAt

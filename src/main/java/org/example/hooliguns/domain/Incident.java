@@ -28,9 +28,9 @@ public class Incident implements Persistable<UUID> {
     @Column("created_at")
     private Instant createdAt;
     @Column("offender_id")
-    private String offenderId;
+    private UUID offenderId;
     @Column("created_by_id")
-    private String createdById;
+    private UUID createdById;
     @Column("moderation_status")
     private ModerationStatus moderationStatus;
     @Column("punishment")

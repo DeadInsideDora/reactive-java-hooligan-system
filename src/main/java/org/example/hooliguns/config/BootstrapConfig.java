@@ -1,6 +1,7 @@
 package org.example.hooliguns.config;
 
 import java.time.Instant;
+import java.util.UUID;
 import org.example.hooliguns.domain.UserAccount;
 import org.example.hooliguns.domain.UserRole;
 import org.example.hooliguns.repository.UserAccountRepository;
@@ -25,8 +26,9 @@ public class BootstrapConfig {
                     return userAccountRepository.save(existing);
                 })
                 .switchIfEmpty(userAccountRepository.save(new UserAccount(
+                        UUID.randomUUID(),
                         username,
-                        username,
+                        null,
                         passwordEncoder.encode(password),
                         "Administrator",
                         UserRole.ADMIN,
@@ -51,8 +53,9 @@ public class BootstrapConfig {
                     return userAccountRepository.save(existing);
                 })
                 .switchIfEmpty(userAccountRepository.save(new UserAccount(
+                        UUID.randomUUID(),
                         username,
-                        username,
+                        null,
                         passwordEncoder.encode(password),
                         "Immortal",
                         UserRole.IMMORTAL,

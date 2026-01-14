@@ -1,16 +1,17 @@
 package org.example.hooliguns.security;
 
 import java.util.Collection;
+import java.util.UUID;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class AuthenticatedUser implements UserDetails {
-    private final String id;
+    private final UUID id;
     private final String username;
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public AuthenticatedUser(String id,
+    public AuthenticatedUser(UUID id,
                              String username,
                              String password,
                              Collection<? extends GrantedAuthority> authorities) {
@@ -20,7 +21,7 @@ public class AuthenticatedUser implements UserDetails {
         this.authorities = authorities;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 

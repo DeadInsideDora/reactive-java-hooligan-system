@@ -31,7 +31,7 @@ public class IncidentSocialService {
                 .defaultIfEmpty(new IncidentSocialSummary(0, 0, 0));
     }
 
-    public Mono<IncidentSocial> addReaction(UUID incidentId, String userId, ReactionType type) {
+    public Mono<IncidentSocial> addReaction(UUID incidentId, UUID userId, ReactionType type) {
         return incidentSocialRepository.findByIncidentId(incidentId)
                 .defaultIfEmpty(new IncidentSocial(null, incidentId, new ArrayList<>(), new ArrayList<>(), Instant.now()))
                 .flatMap(social -> {
@@ -46,7 +46,7 @@ public class IncidentSocialService {
                 });
     }
 
-    public Mono<IncidentSocial> addComment(UUID incidentId, String userId, String text) {
+    public Mono<IncidentSocial> addComment(UUID incidentId, UUID userId, String text) {
         return incidentSocialRepository.findByIncidentId(incidentId)
                 .defaultIfEmpty(new IncidentSocial(null, incidentId, new ArrayList<>(), new ArrayList<>(), Instant.now()))
                 .flatMap(social -> {

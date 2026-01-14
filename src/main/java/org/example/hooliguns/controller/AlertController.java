@@ -26,7 +26,7 @@ public class AlertController {
     @PreAuthorize("hasRole('IMMORTAL')")
     public Mono<AlertResponse> create(@Valid @RequestBody CreateAlertRequest request,
                                       @AuthenticationPrincipal AuthenticatedUser user) {
-        return alertService.create(request, user.getId());
+        return alertService.create(request, user.getId().toString());
     }
 
     @GetMapping

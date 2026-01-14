@@ -27,7 +27,7 @@ public class CommentReportService {
 
     public Mono<CommentReportResponse> create(UUID incidentId,
                                               UUID commentId,
-                                              String reporterId,
+                                              UUID reporterId,
                                               String reason) {
         return incidentSocialRepository.findByIncidentId(incidentId)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("Incident comments not found")))

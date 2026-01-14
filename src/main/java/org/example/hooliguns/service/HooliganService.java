@@ -1,6 +1,7 @@
 package org.example.hooliguns.service;
 
 import java.util.List;
+import java.util.UUID;
 import org.example.hooliguns.dto.HooliganCardResponse;
 import org.example.hooliguns.dto.IncidentResponse;
 import org.example.hooliguns.dto.UserResponse;
@@ -18,7 +19,7 @@ public class HooliganService {
         this.incidentService = incidentService;
     }
 
-    public Mono<HooliganCardResponse> card(String userId) {
+    public Mono<HooliganCardResponse> card(UUID userId) {
         Mono<UserResponse> user = userService.getUser(userId);
         Mono<List<IncidentResponse>> incidents = incidentService.findAllIncidents()
                 .filter(incident -> incident.getOffenderId().equals(userId))

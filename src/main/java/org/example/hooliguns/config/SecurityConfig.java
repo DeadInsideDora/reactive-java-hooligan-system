@@ -24,6 +24,7 @@ public class SecurityConfig {
                 .authenticationManager(userDetailsService.authenticationManager())
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/alerts", "/api/alerts/stream").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/users/register").permitAll()
                         .pathMatchers("/api/**").authenticated()
                         .anyExchange().permitAll()

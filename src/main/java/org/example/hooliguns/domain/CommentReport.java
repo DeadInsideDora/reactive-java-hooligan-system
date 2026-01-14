@@ -17,8 +17,8 @@ public class CommentReport {
     private String id;
     private UUID incidentId;
     private UUID commentId;
-    private String reporterId;
-    private String commentAuthorId;
+    private UUID reporterId;
+    private UUID commentAuthorId;
     private String commentText;
     private Instant commentCreatedAt;
     private String reason;

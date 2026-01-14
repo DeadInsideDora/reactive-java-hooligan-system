@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import org.example.hooliguns.domain.Incident;
 import org.example.hooliguns.domain.ModerationStatus;
+import org.example.hooliguns.domain.UserAccount;
 import org.example.hooliguns.dto.CreateIncidentRequest;
 import org.example.hooliguns.dto.IncidentResponse;
 import org.example.hooliguns.repository.IncidentRepository;
@@ -30,15 +31,14 @@ public class IncidentService {
         this.sink = Sinks.many().multicast().onBackpressureBuffer();
     }
 
-    public Mono<IncidentResponse> create(CreateIncidentRequest request, String createdById) {
-        Mono<Void> offenderCheck = userService.findById(request.offenderId())
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Offender not found")))
-                .then();
+    public Mono<IncidentResponse> create(CreateIncidentRequest request, UUID createdById) {
+        Mono<UserAccount> offender = userService.findByIsu(request.offenderId())
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Offender not found")));
         Mono<Void> creatorCheck = userService.findById(createdById)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("Creator not found")))
                 .then();
 
-        Mono<Void> expulsionCheck = incidentRepository.findAllByOffenderId(request.offenderId())
+        Mono<Void> expulsionCheck = offender.flatMapMany(user -> incidentRepository.findAllByOffenderId(user.getId()))
                 .filter(incident -> incident.getPunishment() != null
                         && incident.getPunishment().name().equals("EXPULSION"))
                 .filter(incident -> incident.getOccurredAt().isBefore(request.occurredAt())
@@ -51,8 +51,11 @@ public class IncidentService {
                     return Mono.empty();
                 });
 
-        return Mono.when(offenderCheck, creatorCheck, expulsionCheck)
-                .then(Mono.defer(() -> {
+        return offender.flatMap(offenderUser ->
+                        Mono.when(creatorCheck, expulsionCheck)
+                                .then(Mono.just(offenderUser))
+                )
+                .flatMap(offenderUser -> {
                     Incident incident = new Incident(
                             UUID.randomUUID(),
                             request.title(),
@@ -62,14 +65,14 @@ public class IncidentService {
                             request.type(),
                             request.occurredAt(),
                             Instant.now(),
-                            request.offenderId(),
+                            offenderUser.getId(),
                             createdById,
                             ModerationStatus.PUBLISHED,
                             request.punishment(),
                             true
                     );
                     return incidentRepository.save(incident);
-                }))
+                })
                 .flatMap(this::toResponse)
                 .doOnNext(response -> sink.tryEmitNext(response));
     }
@@ -81,12 +84,12 @@ public class IncidentService {
                 .flatMapMany(list -> Flux.fromIterable(sortResponses(list, query.sort())));
     }
 
-    public Mono<IncidentResponse> get(java.util.UUID id) {
+    public Mono<IncidentResponse> get(UUID id) {
         return incidentRepository.findById(id)
                 .flatMap(this::toResponse);
     }
 
-    public Mono<IncidentResponse> updateModeration(java.util.UUID id, ModerationStatus status) {
+    public Mono<IncidentResponse> updateModeration(UUID id, ModerationStatus status) {
         return incidentRepository.findById(id)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("Incident not found")))
                 .flatMap(incident -> {
@@ -142,8 +145,16 @@ public class IncidentService {
     }
 
     public Mono<IncidentResponse> toResponse(Incident incident) {
-        return incidentSocialService.summary(incident.getId())
-                .map(summary -> new IncidentResponse(
+        Mono<IncidentSocialSummary> summary = incidentSocialService.summary(incident.getId());
+        Mono<String> offender = userService.findById(incident.getOffenderId())
+                .map(this::userIdentifier)
+                .defaultIfEmpty(incident.getOffenderId().toString());
+        Mono<String> creator = userService.findById(incident.getCreatedById())
+                .map(this::userIdentifier)
+                .defaultIfEmpty(incident.getCreatedById().toString());
+
+        return Mono.zip(summary, offender, creator)
+                .map(tuple -> new IncidentResponse(
                         incident.getId(),
                         incident.getTitle(),
                         incident.getDescription(),
@@ -152,13 +163,13 @@ public class IncidentService {
                         incident.getType(),
                         incident.getOccurredAt(),
                         incident.getCreatedAt(),
-                        incident.getOffenderId(),
-                        incident.getCreatedById(),
+                        tuple.getT2(),
+                        tuple.getT3(),
                         incident.getModerationStatus(),
                         incident.getPunishment(),
-                        summary.likes(),
-                        summary.dislikes(),
-                        summary.comments()
+                        tuple.getT1().likes(),
+                        tuple.getT1().dislikes(),
+                        tuple.getT1().comments()
                 ));
     }
 
@@ -205,5 +216,12 @@ public class IncidentService {
             return responses;
         }
         return responses;
+    }
+
+    private String userIdentifier(UserAccount user) {
+        if (user.getIsu() != null && !user.getIsu().isBlank()) {
+            return user.getIsu();
+        }
+        return user.getUsername();
     }
 }
