@@ -12,5 +12,8 @@ spring:
 
 hooliguns:
   admin:
-    username: admin
-    password: admin
+    username: ${HOOLIGUNS_ADMIN_USERNAME:s000000}
+    password: ${HOOLIGUNS_ADMIN_PASSWORD:admin}
+  immortal:
+    username: ${HOOLIGUNS_IMMORTAL_USERNAME:s999999}
+    password: ${HOOLIGUNS_IMMORTAL_PASSWORD:immortal}

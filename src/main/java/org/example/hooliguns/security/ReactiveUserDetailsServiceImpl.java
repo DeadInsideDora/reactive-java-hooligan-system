@@ -25,7 +25,8 @@ public class ReactiveUserDetailsServiceImpl implements ReactiveUserDetailsServic
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-        return userAccountRepository.findByUsername(username)
+        String normalized = username == null ? null : username.trim().toLowerCase();
+        return userAccountRepository.findByUsername(normalized)
                 .map(this::toUserDetails);
     }
 

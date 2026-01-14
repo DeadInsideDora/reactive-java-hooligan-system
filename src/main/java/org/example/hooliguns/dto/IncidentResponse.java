@@ -1,21 +1,23 @@
 package org.example.hooliguns.dto;
 
 import java.time.Instant;
-import java.util.UUID;
 import org.example.hooliguns.domain.IncidentType;
 import org.example.hooliguns.domain.ModerationStatus;
+import org.example.hooliguns.domain.Punishment;
 
 public record IncidentResponse(
-        UUID id,
+        java.util.UUID id,
         String title,
         String description,
         String place,
+        String department,
         IncidentType type,
         Instant occurredAt,
         Instant createdAt,
-        UUID offenderId,
-        UUID createdById,
+        String offenderId,
+        String createdById,
         ModerationStatus moderationStatus,
+        Punishment punishment,
         long likes,
         long dislikes,
         long comments

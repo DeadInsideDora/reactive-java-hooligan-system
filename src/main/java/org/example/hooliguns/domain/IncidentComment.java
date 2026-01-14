@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IncidentComment {
-    private UUID userId;
+    private UUID id;
+    private String userId;
     private String text;
     private Instant createdAt;
 }

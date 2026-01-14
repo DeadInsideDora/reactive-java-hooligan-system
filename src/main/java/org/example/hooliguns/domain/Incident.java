@@ -21,17 +21,20 @@ public class Incident implements Persistable<UUID> {
     private String title;
     private String description;
     private String place;
+    private String department;
     private IncidentType type;
     @Column("occurred_at")
     private Instant occurredAt;
     @Column("created_at")
     private Instant createdAt;
     @Column("offender_id")
-    private UUID offenderId;
+    private String offenderId;
     @Column("created_by_id")
-    private UUID createdById;
+    private String createdById;
     @Column("moderation_status")
     private ModerationStatus moderationStatus;
+    @Column("punishment")
+    private Punishment punishment;
     @Transient
     private boolean isNew;
 

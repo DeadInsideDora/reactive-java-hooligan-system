@@ -31,7 +31,7 @@ public class IncidentSocialService {
                 .defaultIfEmpty(new IncidentSocialSummary(0, 0, 0));
     }
 
-    public Mono<IncidentSocial> addReaction(UUID incidentId, UUID userId, ReactionType type) {
+    public Mono<IncidentSocial> addReaction(UUID incidentId, String userId, ReactionType type) {
         return incidentSocialRepository.findByIncidentId(incidentId)
                 .defaultIfEmpty(new IncidentSocial(null, incidentId, new ArrayList<>(), new ArrayList<>(), Instant.now()))
                 .flatMap(social -> {
@@ -46,14 +46,14 @@ public class IncidentSocialService {
                 });
     }
 
-    public Mono<IncidentSocial> addComment(UUID incidentId, UUID userId, String text) {
+    public Mono<IncidentSocial> addComment(UUID incidentId, String userId, String text) {
         return incidentSocialRepository.findByIncidentId(incidentId)
                 .defaultIfEmpty(new IncidentSocial(null, incidentId, new ArrayList<>(), new ArrayList<>(), Instant.now()))
                 .flatMap(social -> {
                     List<IncidentComment> comments = new ArrayList<>(
                             social.getComments() == null ? List.of() : social.getComments()
                     );
-                    comments.add(new IncidentComment(userId, text, Instant.now()));
+                    comments.add(new IncidentComment(UUID.randomUUID(), userId, text, Instant.now()));
                     social.setComments(comments);
                     social.setUpdatedAt(Instant.now());
                     return incidentSocialRepository.save(social);
@@ -67,11 +67,29 @@ public class IncidentSocialService {
                 ))
                 .flatMap(comment -> userService.findById(comment.getUserId())
                         .map(user -> new CommentResponse(
+                                comment.getId(),
                                 comment.getUserId(),
                                 user.getDisplayName(),
                                 comment.getText(),
                                 comment.getCreatedAt()
                         )));
+    }
+
+    public Mono<IncidentSocial> deleteComment(UUID incidentId, UUID commentId) {
+        return incidentSocialRepository.findByIncidentId(incidentId)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Incident comments not found")))
+                .flatMap(social -> {
+                    List<IncidentComment> comments = new ArrayList<>(
+                            social.getComments() == null ? List.of() : social.getComments()
+                    );
+                    boolean removed = comments.removeIf(comment -> commentId.equals(comment.getId()));
+                    if (!removed) {
+                        return Mono.error(new IllegalArgumentException("Comment not found"));
+                    }
+                    social.setComments(comments);
+                    social.setUpdatedAt(Instant.now());
+                    return incidentSocialRepository.save(social);
+                });
     }
 
     private IncidentSocialSummary toSummary(IncidentSocial social) {

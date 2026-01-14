@@ -1,9 +1,7 @@
 package org.example.hooliguns.dto;
 
-import java.util.UUID;
-
 public record BoardEntryResponse(
-        UUID userId,
+        String userId,
         String displayName,
         String faculty,
         String groupName,

@@ -2,7 +2,6 @@ package org.example.hooliguns.service;
 
 import java.util.Comparator;
 import java.util.Map;
-import java.util.UUID;
 import org.example.hooliguns.dto.BoardEntryResponse;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;

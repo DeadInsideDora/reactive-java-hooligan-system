@@ -1,17 +1,14 @@
 package org.example.hooliguns.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import org.example.hooliguns.domain.UserRole;
 
-public record CreateUserRequest(
+public record RegisterUserRequest(
         @NotBlank
         @Pattern(regexp = "^s\\d{6}$", message = "ISU must match sXXXXXX")
         String username,
         @NotBlank String password,
         @NotBlank String displayName,
-        @NotNull UserRole role,
         String faculty,
         String groupName
 ) {

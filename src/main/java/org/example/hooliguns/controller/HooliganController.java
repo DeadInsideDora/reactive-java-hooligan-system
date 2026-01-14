@@ -1,6 +1,5 @@
 package org.example.hooliguns.controller;
 
-import java.util.UUID;
 import org.example.hooliguns.dto.BoardEntryResponse;
 import org.example.hooliguns.dto.HooliganCardResponse;
 import org.example.hooliguns.service.BoardService;
@@ -23,14 +22,14 @@ public class HooliganController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('TEACHER','STUDENT','ADMIN')")
-    public Mono<HooliganCardResponse> card(@PathVariable UUID id) {
+    @PreAuthorize("hasAnyRole('TEACHER','STUDENT','ADMIN','IMMORTAL')")
+    public Mono<HooliganCardResponse> card(@PathVariable String id) {
         return hooliganService.card(id);
     }
 
     @GetMapping("/board")
-    @PreAuthorize("hasAnyRole('TEACHER','STUDENT','ADMIN')")
-    public Flux<BoardEntryResponse> board(@RequestParam(defaultValue = "20") int limit) {
+    @PreAuthorize("hasAnyRole('TEACHER','STUDENT','ADMIN','IMMORTAL')")
+    public Flux<BoardEntryResponse> board(@RequestParam(defaultValue = "3") int limit) {
         return boardService.board(limit);
     }
 }

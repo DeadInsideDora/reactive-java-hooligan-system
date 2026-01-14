@@ -30,7 +30,7 @@ public class IncidentService {
         this.sink = Sinks.many().multicast().onBackpressureBuffer();
     }
 
-    public Mono<IncidentResponse> create(CreateIncidentRequest request, UUID createdById) {
+    public Mono<IncidentResponse> create(CreateIncidentRequest request, String createdById) {
         Mono<Void> offenderCheck = userService.findById(request.offenderId())
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("Offender not found")))
                 .then();
@@ -38,19 +38,34 @@ public class IncidentService {
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("Creator not found")))
                 .then();
 
-        return Mono.when(offenderCheck, creatorCheck)
+        Mono<Void> expulsionCheck = incidentRepository.findAllByOffenderId(request.offenderId())
+                .filter(incident -> incident.getPunishment() != null
+                        && incident.getPunishment().name().equals("EXPULSION"))
+                .filter(incident -> incident.getOccurredAt().isBefore(request.occurredAt())
+                        || incident.getOccurredAt().equals(request.occurredAt()))
+                .hasElements()
+                .flatMap(hasExpulsion -> {
+                    if (hasExpulsion) {
+                        return Mono.error(new IllegalArgumentException("Offender already expelled; cannot add later incident"));
+                    }
+                    return Mono.empty();
+                });
+
+        return Mono.when(offenderCheck, creatorCheck, expulsionCheck)
                 .then(Mono.defer(() -> {
                     Incident incident = new Incident(
                             UUID.randomUUID(),
                             request.title(),
                             request.description(),
                             request.place(),
+                            request.department(),
                             request.type(),
                             request.occurredAt(),
                             Instant.now(),
                             request.offenderId(),
                             createdById,
                             ModerationStatus.PUBLISHED,
+                            request.punishment(),
                             true
                     );
                     return incidentRepository.save(incident);
@@ -66,12 +81,12 @@ public class IncidentService {
                 .flatMapMany(list -> Flux.fromIterable(sortResponses(list, query.sort())));
     }
 
-    public Mono<IncidentResponse> get(UUID id) {
+    public Mono<IncidentResponse> get(java.util.UUID id) {
         return incidentRepository.findById(id)
                 .flatMap(this::toResponse);
     }
 
-    public Mono<IncidentResponse> updateModeration(UUID id, ModerationStatus status) {
+    public Mono<IncidentResponse> updateModeration(java.util.UUID id, ModerationStatus status) {
         return incidentRepository.findById(id)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("Incident not found")))
                 .flatMap(incident -> {
@@ -116,8 +131,12 @@ public class IncidentService {
         }
         if (query.query() != null && !query.query().isBlank()) {
             String needle = query.query().toLowerCase();
-            return incident.getTitle().toLowerCase().contains(needle)
-                    || incident.getDescription().toLowerCase().contains(needle);
+            String title = incident.getTitle() == null ? "" : incident.getTitle().toLowerCase();
+            String description = incident.getDescription() == null ? "" : incident.getDescription().toLowerCase();
+            String place = incident.getPlace() == null ? "" : incident.getPlace().toLowerCase();
+            return title.contains(needle)
+                    || description.contains(needle)
+                    || place.contains(needle);
         }
         return true;
     }
@@ -129,12 +148,14 @@ public class IncidentService {
                         incident.getTitle(),
                         incident.getDescription(),
                         incident.getPlace(),
+                        incident.getDepartment(),
                         incident.getType(),
                         incident.getOccurredAt(),
                         incident.getCreatedAt(),
                         incident.getOffenderId(),
                         incident.getCreatedById(),
                         incident.getModerationStatus(),
+                        incident.getPunishment(),
                         summary.likes(),
                         summary.dislikes(),
                         summary.comments()

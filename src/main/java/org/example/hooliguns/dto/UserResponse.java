@@ -1,11 +1,10 @@
 package org.example.hooliguns.dto;
 
 import java.time.Instant;
-import java.util.UUID;
 import org.example.hooliguns.domain.UserRole;
 
 public record UserResponse(
-        UUID id,
+        String id,
         String username,
         String displayName,
         UserRole role,

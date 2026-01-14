@@ -1,7 +1,6 @@
 package org.example.hooliguns.domain;
 
 import java.time.Instant;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IncidentReaction {
-    private UUID userId;
+    private String userId;
     private ReactionType type;
     private Instant reactedAt;
 }

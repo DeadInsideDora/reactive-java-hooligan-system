@@ -41,3 +41,6 @@ bin/
 ### Mac OS ###
 .DS_Store
 .venv/
+
+.env
+frontend/node_modules

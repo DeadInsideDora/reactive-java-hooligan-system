@@ -37,14 +37,14 @@ public class IncidentController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('TEACHER')")
+    @PreAuthorize("hasAnyRole('TEACHER','ADMIN','IMMORTAL')")
     public Mono<IncidentResponse> create(@Valid @RequestBody CreateIncidentRequest request,
                                          @AuthenticationPrincipal AuthenticatedUser user) {
         return incidentService.create(request, user.getId());
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('TEACHER','STUDENT','ADMIN')")
+    @PreAuthorize("hasAnyRole('TEACHER','STUDENT','ADMIN','IMMORTAL')")
     public Flux<IncidentResponse> list(@RequestParam(required = false) String q,
                                        @RequestParam(required = false) String faculty,
                                        @RequestParam(required = false) String group,
@@ -59,20 +59,20 @@ public class IncidentController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('TEACHER','STUDENT','ADMIN')")
+    @PreAuthorize("hasAnyRole('TEACHER','STUDENT','ADMIN','IMMORTAL')")
     public Mono<IncidentResponse> get(@PathVariable UUID id) {
         return incidentService.get(id);
     }
 
     @PatchMapping("/{id}/moderation")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','IMMORTAL')")
     public Mono<IncidentResponse> moderate(@PathVariable UUID id,
                                            @Valid @RequestBody ModerationRequest request) {
         return incidentService.updateModeration(id, request.status());
     }
 
     @PostMapping("/{id}/reactions")
-    @PreAuthorize("hasAnyRole('TEACHER','STUDENT')")
+    @PreAuthorize("hasAnyRole('TEACHER','STUDENT','ADMIN','IMMORTAL')")
     public Mono<Void> react(@PathVariable UUID id,
                             @Valid @RequestBody ReactionRequest request,
                             @AuthenticationPrincipal AuthenticatedUser user) {
@@ -80,7 +80,7 @@ public class IncidentController {
     }
 
     @PostMapping("/{id}/comments")
-    @PreAuthorize("hasAnyRole('TEACHER','STUDENT')")
+    @PreAuthorize("hasAnyRole('TEACHER','STUDENT','ADMIN','IMMORTAL')")
     public Mono<Void> comment(@PathVariable UUID id,
                               @Valid @RequestBody CommentRequest request,
                               @AuthenticationPrincipal AuthenticatedUser user) {
@@ -88,13 +88,20 @@ public class IncidentController {
     }
 
     @GetMapping("/{id}/comments")
-    @PreAuthorize("hasAnyRole('TEACHER','STUDENT','ADMIN')")
+    @PreAuthorize("hasAnyRole('TEACHER','STUDENT','ADMIN','IMMORTAL')")
     public Flux<CommentResponse> comments(@PathVariable UUID id) {
         return incidentSocialService.getComments(id);
     }
 
+    @DeleteMapping("/{id}/comments/{commentId}")
+    @PreAuthorize("hasAnyRole('ADMIN','IMMORTAL')")
+    public Mono<Void> deleteComment(@PathVariable UUID id,
+                                    @PathVariable UUID commentId) {
+        return incidentSocialService.deleteComment(id, commentId).then();
+    }
+
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    @PreAuthorize("hasAnyRole('TEACHER','STUDENT','ADMIN')")
+    @PreAuthorize("hasAnyRole('TEACHER','STUDENT','ADMIN','IMMORTAL')")
     public Flux<ServerSentEvent<IncidentResponse>> stream() {
         return incidentService.stream()
                 .map(response -> ServerSentEvent.builder(response)
